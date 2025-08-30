@@ -1,12 +1,26 @@
-# React + Vite
+# 🛒 Car Accessories E-Commerce Web App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack e-commerce application built with **React** (frontend) and **Spring Boot** (backend).  
+The app allows users to browse products, manage their cart, place orders, and make payments securely.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## Expanding the ESLint configuration
+- 🔐 **User Authentication** (Register, Login)
+- 👤 **Buyer Profile** (Fetch user details)
+- 🛍️ **Product Management** (View all available products)
+- 🛒 **Shopping Cart**
+  - Add / remove items
+  - Update quantity
+  - Checkout
+- 📦 **Order Management**
+  - Create orders from cart
+  - View order history
+- 💳 **Payment Processing** (record payment for orders)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 📂 Project Structure
+
+### Frontend (React)
