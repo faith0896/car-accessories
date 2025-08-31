@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar.jsx";
 import Home from "./pages/Home.jsx";
@@ -9,7 +9,7 @@ import Checkout from "./pages/Checkout.jsx";
 import Orders from "./pages/Orders.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx"; 
+import Register from "./pages/Register.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
 
 export default function App() {
@@ -17,7 +17,7 @@ export default function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
-  // 🔹 Switch Login → Register using custom event
+  // Switch Login → Register
   useEffect(() => {
     const handleOpenRegister = () => {
       setShowLogin(false);
@@ -27,7 +27,7 @@ export default function App() {
     return () => window.removeEventListener("open-register", handleOpenRegister);
   }, []);
 
-  // 🔹 Switch Register → Login using custom event
+  // Switch Register → Login
   useEffect(() => {
     const handleOpenLogin = () => {
       setShowRegister(false);
@@ -39,7 +39,6 @@ export default function App() {
 
   return (
     <Router>
-      {/* Navbar with login trigger */}
       <Navbar
         isLoggedIn={!!user}
         onLoginClick={() => setShowLogin(true)}
@@ -47,23 +46,24 @@ export default function App() {
       />
 
       <Routes>
-        {/* Home */}
         <Route path="/" element={<Home />} />
-
-        {/* Pages */}
         <Route path="/shop" element={<Shop />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/orders" element={<Orders />} />
 
-        {/* Admin protected */}
+        {/* Admin Dashboard: protected */}
         <Route
           path="/admin"
-          element={user?.role === "admin" ? <AdminDashboard /> : <Navigate to="/" />}
+          element={
+            user?.role?.toUpperCase() === "ADMIN"
+              ? <AdminDashboard />
+              : <Navigate to="/" />
+          }
         />
 
-        {/* Direct routes */}
+        {/* Login and Register pages (optional routing) */}
         <Route
           path="/login"
           element={<Login onLogin={setUser} onClose={() => setShowLogin(false)} />}
@@ -73,7 +73,7 @@ export default function App() {
           element={<Register onClose={() => setShowRegister(false)} />}
         />
 
-        {/* Payment protected */}
+        {/* Payment Page: requires login */}
         <Route
           path="/payment"
           element={user ? <PaymentPage /> : <Navigate to="/login" />}
@@ -83,18 +83,28 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
-      {/* 🔹 Popup Login */}
+      {/* Popup Login */}
       {showLogin && (
         <Login
           onLogin={(loggedInUser) => {
-            setUser(loggedInUser); // ✅ user info comes from backend login API
+            setUser(loggedInUser);
+
+            // Use navigate to redirect after login (replace window.location.href)
+            if (loggedInUser.role?.toUpperCase() === "ADMIN") {
+              window.history.pushState({}, "", "/admin");
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            } else {
+              window.history.pushState({}, "", "/");
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }
+
             setShowLogin(false);
           }}
           onClose={() => setShowLogin(false)}
         />
       )}
 
-      {/* 🔹 Popup Register */}
+      {/* Popup Register */}
       {showRegister && (
         <Register onClose={() => setShowRegister(false)} />
       )}
