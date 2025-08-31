@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState }from "react";
 import { useCart } from "../context/CartContext.jsx";
 import { getProducts } from "../services/Api.js";
+i
 
 export default function Shop() {
   const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
 
-  useEffect(() => {
-    getProducts()
+  useEffect(() => { getProducts()
       .then(res => setProducts(res.data))
       .catch(err => console.error("Error fetching products:", err));
   }, []);
@@ -75,3 +75,5 @@ export default function Shop() {
     </div>
   );
 }
+
+
