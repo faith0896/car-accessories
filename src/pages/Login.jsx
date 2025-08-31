@@ -5,6 +5,7 @@ import { loginUser } from "../services/Api.js";
 export default function Login({ onLogin, onClose }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("BUYER"); // Default role set to BUYER
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -16,12 +17,32 @@ export default function Login({ onLogin, onClose }) {
       return;
     }
 
+    if (!role) {
+      setError("Please select a role");
+      return;
+    }
+
     try {
-      const response = await loginUser({ email, password });
-  const userData = response.data; // backend should return { id, name, email, role }
-  onLogin(userData);
-  onClose();
-  navigate("/");
+      // Pass role with email and password to backend (role may or may not be used by backend)
+      const response = await loginUser({ email, password, role });
+      const userData = response.data; // Expect role in response data
+
+      if (!userData.role) {
+        setError("User role not found. Please check your backend.");
+        return;
+      }
+
+      onLogin(userData); // Save logged-in user info in app state
+      onClose(); // Close login modal
+
+      // Redirect based on user role
+      if (userData.role.toUpperCase() === "ADMIN") {
+        navigate("/admin");
+      } else if (userData.role.toUpperCase() === "BUYER") {
+        navigate("/");
+      } else {
+        setError("Unauthorized role");
+      }
     } catch (err) {
       setError("Invalid email or password");
     }
@@ -31,7 +52,7 @@ export default function Login({ onLogin, onClose }) {
     <div style={styles.overlay}>
       <div style={styles.loginBox}>
         <button style={styles.closeBtn} onClick={onClose}>×</button>
-        
+
         <h2 style={styles.title}>Login</h2>
         {error && <p style={styles.error}>{error}</p>}
 
@@ -50,6 +71,32 @@ export default function Login({ onLogin, onClose }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+
+          {/* Role Selection */}
+          <div style={styles.roleContainer}>
+            <label style={styles.roleLabel}>
+              <input
+                type="radio"
+                name="role"
+                value="BUYER"
+                checked={role === "BUYER"}
+                onChange={() => setRole("BUYER")}
+              />
+              Buyer
+            </label>
+
+            <label style={styles.roleLabel}>
+              <input
+                type="radio"
+                name="role"
+                value="ADMIN"
+                checked={role === "ADMIN"}
+                onChange={() => setRole("ADMIN")}
+              />
+              Admin
+            </label>
+          </div>
+
           <button style={styles.button} type="submit">Login</button>
         </form>
 
@@ -71,7 +118,6 @@ export default function Login({ onLogin, onClose }) {
 }
 
 const styles = {
-  /* Overlay behind popup */
   overlay: {
     position: "fixed",
     top: 0, left: 0,
@@ -82,8 +128,6 @@ const styles = {
     justifyContent: "center",
     zIndex: 2000,
   },
-
-  /* Login box */
   loginBox: {
     position: "relative",
     background: "#fff",
@@ -94,12 +138,10 @@ const styles = {
     boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
     borderTop: "6px solid #ffcc00",
   },
-
   title: {
     marginBottom: "20px",
     color: "#000",
   },
-
   input: {
     width: "100%",
     padding: "12px",
@@ -108,7 +150,15 @@ const styles = {
     borderRadius: "8px",
     fontSize: "1rem",
   },
-
+  roleContainer: {
+    marginBottom: "15px",
+    display: "flex",
+    justifyContent: "space-around",
+  },
+  roleLabel: {
+    fontSize: "1rem",
+    cursor: "pointer",
+  },
   button: {
     width: "100%",
     padding: "12px",
@@ -120,26 +170,19 @@ const styles = {
     cursor: "pointer",
     transition: "0.3s",
   },
-
-  buttonHover: {
-    background: "#000",
-    color: "#fff",
-  },
-
   registerLink: {
-    marginTop: "1rem",
-    display: "block",
     fontSize: "0.9rem",
     color: "#007BFF",
     cursor: "pointer",
   },
-
+  switchText: {
+    marginTop: "15px",
+  },
   error: {
     color: "red",
     fontSize: "0.85rem",
     marginBottom: "1rem",
   },
-
   closeBtn: {
     position: "absolute",
     top: "10px",
@@ -151,4 +194,3 @@ const styles = {
     color: "#000",
   },
 };
-
