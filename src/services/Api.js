@@ -57,19 +57,21 @@ export const getCart = (buyerId) =>
 
 // ================= ORDER =================
 
-// Fetch orders by buyerId (if backend supports it)
-export const getOrdersByBuyerId = (buyerId) =>
-  api.get(`/orders/buyer/${buyerId}`);
-
 // Create order
 export const createOrder = (orderData) =>
   api.post("/order/create", orderData);
 
-// Fetch all orders
-export const getAllOrders = () => api.get("/order/All");
+// Fetch orders by USER ID (backend uses "user")
+export const getOrdersByUserId = (userId) =>
+  api.get(`/order/user/${userId}`);
 
-// ✅ Fetch single order by orderId
-export const getOrderById = (orderId) => api.get(`/order/${orderId}`);
+// Fetch all orders
+export const getAllOrders = () => api.get("/order/all");
+
+//  Fetch single order by orderId
+export const getOrderById = (orderId) =>
+  api.get(`/order/read/${orderId}`);
+
 
 // ================= PAYMENT =================
 

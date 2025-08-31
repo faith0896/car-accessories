@@ -1,190 +1,74 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getAllOrders } from "../services/Api";
+import { getAllOrders } from "../services/Api.js";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expandedOrderId, setExpandedOrderId] = useState(null); // ✅ Track which order is expanded
-  const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await getAllOrders();
-        console.log("Full response from backend:", res);
-
-        let ordersData;
-
-        // ✅ Handle JSON string responses
-        if (typeof res.data === "string") {
-          try {
-            ordersData = JSON.parse(res.data);
-          } catch (err) {
-            console.error("Failed to parse orders JSON:", err);
-            ordersData = [];
-          }
-        } else {
-          ordersData = res.data;
-        }
-
-        // ✅ Normalize response
-        if (!ordersData) {
-          setOrders([]);
-        } else if (Array.isArray(ordersData)) {
-          setOrders(ordersData);
-        } else {
-          setOrders([ordersData]);
-        }
-      } catch (err) {
+    getAllOrders()
+      .then((response) => {
+        console.log("Orders from backend:", response.data);
+        setOrders(response.data || []);
+      })
+      .catch((err) => {
         console.error("Error fetching orders:", err);
-        setOrders([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
+        setError("Failed to fetch orders.");
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  const toggleOrderDetails = (orderId) => {
-    setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
-  };
-
   if (loading) return <p>Loading orders...</p>;
-  if (orders.length === 0) return <p>No orders found.</p>;
+  if (error) return <p>{error}</p>;
+  if (!orders.length) return <p>No orders found.</p>;
 
   return (
-    <div className="orders">
-      <h2>Order History</h2>
-      {orders.map((order) => (
-        <div
-          key={order.orderId}
-          style={{
-            border: "1px solid #ccc",
-            padding: "12px",
-            borderRadius: "8px",
-            marginBottom: "12px",
-            background: "#fff",
-          }}
-        >
-          <p>
-            <strong>Order ID:</strong> {order.orderId}
-          </p>
-          <p>
-            <strong>Order Date:</strong>{" "}
-            {order.orderDate
-              ? new Date(order.orderDate).toLocaleString()
-              : "N/A"}
-          </p>
-          <p>
-            <strong>Status:</strong> {order.status}
-          </p>
-          <p>
-            <strong>Total:</strong> R{order.totalAmount}
-          </p>
-          <p>
-            <strong>Buyer:</strong>{" "}
-            {order.buyer
-              ? `${order.buyer.firstName || ""} ${order.buyer.lastName || ""} (${
-                  order.buyer.email || "No email"
-                })`
-              : "N/A"}
-          </p>
-          <p>
-            <strong>Payment Method:</strong>{" "}
-            {order.payment?.paymentMethod || "N/A"}
-          </p>
-          <p>
-            <strong>Payment Status:</strong> {order.payment?.status || "N/A"}
-          </p>
-
-          {/* Expandable order items */}
-          <button
-            onClick={() => toggleOrderDetails(order.orderId)}
-            className="toggle-btn"
-          >
-            {expandedOrderId === order.orderId ? "Hide Items" : "View Items"}
-          </button>
-
-          {expandedOrderId === order.orderId && (
-            <div className="order-items">
-              <h4>Items:</h4>
-              {order.orderItems && order.orderItems.length > 0 ? (
-                <ul>
-                  {order.orderItems.map((item, index) => (
-                    <li key={index}>
-                      {item.product?.name || "Unknown Product"} — Qty: {item.quantity} — R
-                      {(item.priceAtPurchase ?? item.product?.price ?? 0).toFixed(2)}
+    <div className="orders-container">
+      <h2 className="orders-title">All Orders</h2>
+      <div className="orders-grid">
+        {orders.map((order) => (
+          <div key={order.orderId} className="order-card">
+            <p className="order-id"><strong>Order ID:</strong> {order.orderId}</p>
+            <p className="order-status"><strong>Status:</strong> {order.status}</p>
+            <p className="order-date"><strong>Order Date:</strong> {order.orderDate || "N/A"}</p>
+            {order.payment ? (
+              <div className="payment-info">
+                <p><strong>Payment:</strong> {order.payment.amount} ({order.payment.status})</p>
+              </div>
+            ) : (
+              <p className="empty-text">No payment recorded.</p>
+            )}
+            {order.orderItems && order.orderItems.length > 0 && (
+              <div className="order-details">
+                <p className="section-title">Items:</p>
+                <ul className="order-items">
+                  {order.orderItems.map((item, idx) => (
+                    <li key={idx} className="order-item">
+                      {item.productName} x {item.quantity}
                     </li>
                   ))}
                 </ul>
-              ) : (
-                <p>No items found for this order.</p>
-              )}
-            </div>
-          )}
-
-        </div>
-      ))}
-
-      <button onClick={() => navigate("/")} className="back-home-btn">
-        Back to Home
-      </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
 
       <style>{`
-        .orders {
-          padding: 20px;
-          font-family: Arial, sans-serif;
-          background: #f5f5f5;
-        }
-        h2 {
-          margin-bottom: 16px;
-        }
-        .toggle-btn {
-          background: #ffd600;
-          color: #fff;
-          padding: 8px 16px;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          margin-top: 10px;
-        }
-        .toggle-btn:hover {
-          background: #ffb300;
-        }
-        .order-items {
-          margin-top: 12px;
-          padding: 10px;
-          background: #f9f9f9;
-          border-radius: 6px;
-        }
-        .order-items ul {
-          list-style-type: none;
-          padding: 0;
-        }
-        .order-items li {
-          padding: 4px 0;
-          border-bottom: 1px solid #ddd;
-        }
-        .back-home-btn {
-          background: #ffd600;
-          color: #fff;
-          padding: 10px 20px;
-          border: none;
-          border-radius: 8px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: background 0.3s;
-          margin-top: 20px;
-        }
-        .back-home-btn:hover {
-          background: #ffb300;
-        }
+        .orders-container { font-family: Arial; padding: 20px; background: #f5f5f5; min-height: 100vh; }
+        .orders-title { text-align: center; margin-bottom: 20px; font-size: 1.8rem; font-weight: bold; }
+        .orders-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+        .order-card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .order-card:hover { transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,0.15); }
+        .order-id { font-weight: 600; font-size: 1.1rem; }
+        .order-date, .order-status { font-size: 0.9rem; color: #666; }
+        .order-details { margin-top: 16px; padding-top: 12px; border-top: 1px solid #ddd; }
+        .order-items { list-style: none; padding: 0; margin: 0; }
+        .order-item { padding: 6px 0; border-bottom: 1px solid #eee; }
+        .empty-text { color: #777; font-size: 0.9rem; }
+        .payment-info { margin-top: 12px; }
       `}</style>
     </div>
   );
 }
-
-
-
