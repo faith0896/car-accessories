@@ -2,6 +2,7 @@ import ReviewList from "../components/ReviewList";
 
 export default function ProductDetail() {
     const product = { name: "Racing Seat Cover", price: 1200, imageURL: "", description: "High-quality leather seat cover." };
+    
     const reviews = [{ rating: 5, comment: "Amazing quality!" }];
     return (
         <div className="p-6">

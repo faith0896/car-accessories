@@ -1,6 +1,6 @@
 export default function ReviewList({ reviews }) {
-  return (
-    <div>
+return(
+<div>
       <h3 className="font-bold text-lg">Reviews</h3>
       {reviews.map((r) => (
         <div key={r.reviewId} className="border-b py-2">
@@ -8,6 +8,7 @@ export default function ReviewList({ reviews }) {
           <p>{r.comment}</p>
         </div>
       ))}
-    </div>
+    
+   </div>
   );
 }
