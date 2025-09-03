@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
-import { createOrder, createPayment } from "../services/Api.js";
+import { createOrder, createPayment, getOrderById } from "../services/Api.js";
 
 export default function PaymentPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { clearCart } = useCart();
 
-  
   const cartFromState = location.state?.cartItems || [];
   const cartFromStorage = (() => {
     try {
@@ -47,7 +46,7 @@ export default function PaymentPage() {
     setCartItems(items);
     const randomOrder = "ORD" + Math.floor(100000 + Math.random() * 900000);
     setOrderNumber(randomOrder);
-  }, [location.key]); 
+  }, [location.key]);
 
   const handleDeliveryChange = (e) => {
     const { name, value } = e.target;
@@ -73,9 +72,8 @@ export default function PaymentPage() {
       return;
     }
 
-    
     const orderItems = cartItems.map((item) => ({
-      productId: item.productId || item.id,   
+      productId: item.productId || item.id,
       quantity: item.quantity,
       priceAtPurchase: item.price,
     }));
@@ -85,39 +83,42 @@ export default function PaymentPage() {
       contactName: trimmedDelivery.fullName,
       contactPhone: trimmedDelivery.phone,
       deliveryAddress: `${trimmedDelivery.address}, ${trimmedDelivery.city}, ${trimmedDelivery.postalCode}`,
-      orderItems,              
+      orderItems,
       paymentMethod,
       subtotal,
       deliveryFee,
       vat,
-      grandTotal,              
+      grandTotal,
       status: "PENDING",
     };
 
     try {
-    
-
+      //  Create the order
       const orderResponse = await createOrder(orderData);
-      const savedOrder = orderResponse.data;
+      let savedOrder = orderResponse.data;
 
+      // Create the payment
       const paymentData = {
         paymentDate: new Date().toISOString().split("T")[0],
         paymentMethod,
         amount: grandTotal,
         status: paymentMethod === "eft" ? "PENDING" : "PAID",
-        order: savedOrder, 
+        order: savedOrder,
       };
 
       await createPayment(paymentData);
 
-      
+      // Re-fetch the order so it includes payment
+      const updatedOrderResponse = await getOrderById(savedOrder.orderId);
+      savedOrder = updatedOrderResponse.data;
+
+      // Save to localStorage
       localStorage.setItem("latestOrder", JSON.stringify(savedOrder));
 
-      
+      // Clear cart + navigate to orders page
       clearCart();
       localStorage.removeItem("cart");
 
-      
       navigate("/orders", { state: { orderData: savedOrder } });
     } catch (error) {
       console.error("Error placing order:", error);
@@ -131,7 +132,7 @@ export default function PaymentPage() {
   return (
     <div className="payment-page">
       <div className="main-content">
-        
+        {/* Delivery Section */}
         <div className="section">
           <h3>Delivery Address</h3>
           {["fullName", "address", "city", "postalCode", "phone"].map((field) => (
@@ -149,7 +150,7 @@ export default function PaymentPage() {
           ))}
         </div>
 
-        
+        {/* Order Section */}
         <div className="section">
           <h3>Order Details</h3>
           <div className="order-items">
@@ -170,7 +171,7 @@ export default function PaymentPage() {
           </p>
         </div>
 
-        
+        {/* Payment Section */}
         <div className="section" id="payment-section">
           <h3>Payment Method</h3>
           <div className="payment-method">
@@ -273,7 +274,7 @@ export default function PaymentPage() {
         </div>
       </div>
 
-      
+      {/* Order Summary */}
       <div className="order-summary">
         <h3>Order Summary</h3>
         <p>

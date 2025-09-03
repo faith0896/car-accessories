@@ -3,6 +3,7 @@ import { useState } from "react";
 import CartPage from "../pages/CartPage";
 import { useCart } from "../context/CartContext"; 
 import { ShoppingBag, ShoppingCart, Package, LogIn } from "lucide-react";
+import logo from "../Images/logo.jpg";
 
 export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -33,7 +34,7 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
           </div>
 
           <div className="logo-box">
-            <img src="/src/images/logo.png" alt="Logo" className="logo-img" />
+            <img src={logo} alt="Logo" className="logo-img" />
           </div>
         </div>
 
@@ -120,7 +121,7 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
           position: fixed;
           top: 0; left: 0; right: 0;
           height: var(--nav-height);
-          background: #222;
+          background: #000000ff;
           color: #fff;
           display: flex;
           align-items: center;
@@ -134,6 +135,19 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
         .logo-box { width: 50px; height: 50px; }
         .logo-img { width: 100%; height: auto; object-fit: contain; }
 
+        .logo-box {
+          width: 200px;   /* wider box */
+          height: auto;   /* let height adjust automatically */
+          display: flex;
+          align-items: center;
+        }
+
+        .logo-img {
+          width: 100%;
+          height: auto;
+          object-fit: contain;
+}
+
         .site-name {
           font-size: 1.8rem;
           font-weight: bold;
@@ -146,7 +160,7 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
         .right-links { 
           display: flex; 
           align-items: center;
-          gap: 7px; /* ✅ more spacious */
+          gap: 7px; /* more spacious */
         }
         .right-links a, .right-links span {
           position: relative;
@@ -160,7 +174,7 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
         }
         .right-links a:hover, .right-links span:hover { color: #ffcc00; }
 
-        /* ✅ Tooltip */
+        /* Tooltip */
         .tooltip-container {
           position: relative;
         }
@@ -185,7 +199,7 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
           opacity: 1;
         }
 
-        /* ✅ Divider before login */
+        /* Divider before login */
         .nav-divider {
           height: 28px;
           width: 1px;
@@ -193,7 +207,7 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
           margin: 0 12px;
         }
 
-        /* ✅ Cart Badge */
+        /* Cart Badge */
         .cart-badge {
           position: absolute;
           top: -6px;
