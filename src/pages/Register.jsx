@@ -9,9 +9,9 @@ export default function Register({ onClose }) {
     email: "",
     password: "",
     address: "",
-    phoneNumber: "",   // changed to camelCase
+    phoneNumber: "",
     role: "USER",
-    adminCode: "",     // changed to camelCase
+    adminCode: "",
   });
   const [error, setError] = useState("");
 
@@ -91,7 +91,7 @@ export default function Register({ onClose }) {
           />
           <input
             style={styles.input}
-            name="phoneNumber"      // camelCase here
+            name="phoneNumber"
             type="text"
             placeholder="Phone Number"
             value={formData.phoneNumber}
@@ -110,7 +110,7 @@ export default function Register({ onClose }) {
           {formData.role === "ADMIN" && (
             <input
               style={styles.input}
-              name="adminCode"       // camelCase here
+              name="adminCode"
               type="text"
               placeholder="Admin Code"
               value={formData.adminCode}
@@ -157,7 +157,7 @@ const styles = {
     width: "400px",
     textAlign: "center",
     boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
-    borderTop: "6px solid #ffcc00",
+    borderTop: "6px solid #000",  // black top border
   },
   title: {
     marginBottom: "20px",
@@ -167,20 +167,23 @@ const styles = {
     width: "100%",
     padding: "12px",
     marginBottom: "15px",
-    border: "1px solid #ccc",
+    border: "1px solid #000",
     borderRadius: "8px",
     fontSize: "1rem",
+    color: "#000",
+    backgroundColor: "#fff",
   },
   button: {
     width: "100%",
     padding: "12px",
-    background: "#ffcc00",
+    background: "#000",
     border: "none",
     borderRadius: "8px",
     fontWeight: "bold",
     fontSize: "1rem",
     cursor: "pointer",
     transition: "0.3s",
+    color: "#fff",
   },
   switchText: {
     marginTop: "1rem",
@@ -188,9 +191,10 @@ const styles = {
     color: "#000",
   },
   link: {
-    color: "#007BFF",
+    color: "#000",
     cursor: "pointer",
     fontWeight: "bold",
+    textDecoration: "underline",
   },
   closeBtn: {
     position: "absolute",
