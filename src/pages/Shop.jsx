@@ -1,7 +1,7 @@
 import {useEffect, useState }from "react";
 import { useCart } from "../context/CartContext.jsx";
 import { getProducts } from "../services/Api.js";
-i
+
 
 export default function Shop() {
   const { addToCart } = useCart();

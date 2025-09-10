@@ -2,11 +2,9 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import CartPage from "../pages/CartPage";
 import { useCart } from "../context/CartContext"; 
-import { ShoppingBag, ShoppingCart, Package, LogIn } from "lucide-react";
 import logo from "../Images/logo.jpg";
 
 export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
 
@@ -24,67 +22,50 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
 
   return (
     <>
+      {/* Top Navbar */}
       <nav className="navbar">
-        {/* Left Section */}
         <div className="left-section">
-          <div className={`hamburger ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-
           <div className="logo-box">
             <img src={logo} alt="Logo" className="logo-img" />
           </div>
         </div>
 
-        {/* Center: Site Name */}
         <Link to="/" className="site-name">Car Accessories</Link>
 
-        {/* Right Section: Icons */}
         <div className="right-links">
           <Link to="/shop" className="tooltip-container">
-            <ShoppingBag size={20} />
+            Shop
             <span className="tooltip-text">Shop</span>
           </Link>
 
           <Link to="/cart" onClick={(e) => handleProtectedClick(e, "cart")} className="tooltip-container cart-link">
-            <ShoppingCart size={20} />
-            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+            Cart {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
             <span className="tooltip-text">Cart</span>
           </Link>
 
           <Link to="/orders" onClick={(e) => handleProtectedClick(e, "orders")} className="tooltip-container">
-            <Package size={20} />
+            Orders
             <span className="tooltip-text">Orders</span>
           </Link>
 
           <div className="nav-divider"></div>
 
           {isLoggedIn ? (
-            <span onClick={onLogoutClick} className="tooltip-container">
-              <LogIn size={20} style={{ transform: "rotate(180deg)" }} />
+            <span onClick={onLogoutClick} className="tooltip-container logout-link" style={{ cursor: "pointer" }}>
+              Logout
               <span className="tooltip-text">Logout</span>
             </span>
           ) : (
-            <span onClick={onLoginClick} className="tooltip-container">
-              <LogIn size={20} />
+            <span onClick={onLoginClick} className="tooltip-container login-link" style={{ cursor: "pointer" }}>
+              Login
               <span className="tooltip-text">Login</span>
             </span>
           )}
         </div>
       </nav>
 
-      {/* Sidebar */}
-      <div className={`sidebar ${menuOpen ? "active" : ""}`}>
-        <h3>Quick Navigation</h3>
-        <Link to="/shop/steering-wheel-cover" onClick={() => setMenuOpen(false)}>Battery Charging & Jump Starting</Link>
-        <Link to="/shop/tyres" onClick={() => setMenuOpen(false)}>Tyres</Link>
-        <Link to="/shop/rims" onClick={() => setMenuOpen(false)}>Rims</Link>
-        <Link to="/shop/seat-covers" onClick={() => setMenuOpen(false)}>Seat Covers</Link>
-        <Link to="/shop/oils" onClick={() => setMenuOpen(false)}>Oils</Link>
-        <Link to="/shop/lights" onClick={() => setMenuOpen(false)}>Sound System</Link>
-      </div>
+      {/* Bottom Black Bar */}
+      <nav className="bottom-bar"></nav>
 
       {/* Cart Drawer */}
       <div className={`cart-drawer ${cartOpen ? "open" : ""}`}>
@@ -113,31 +94,40 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
       )}
 
       <style>{`
-        :root { --nav-height: 84px; }
-        body { margin: 0; padding-top: var(--nav-height); }
+        :root {
+          --nav-height: 84px;
+        }
 
-        /* NAVBAR */
+        /* BODY PADDING */
+        body {
+          margin: 0;
+          padding-top: var(--nav-height);
+          padding-bottom: var(--nav-height);
+        }
+
+        /* TOP NAVBAR */
         .navbar {
           position: fixed;
           top: 0; left: 0; right: 0;
           height: var(--nav-height);
-          background: #000000ff;
+          background: #000;
           color: #fff;
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 0 24px;
-          box-shadow: 0 2px 8px rgba(0,0,0,.35);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.35);
           z-index: 1000;
         }
 
-        .left-section { display: flex; align-items: center; gap: 16px; }
-        .logo-box { width: 50px; height: 50px; }
-        .logo-img { width: 100%; height: auto; object-fit: contain; }
+        .left-section {
+          display: flex;
+          align-items: center;
+        }
 
         .logo-box {
-          width: 200px;   /* wider box */
-          height: auto;   /* let height adjust automatically */
+          width: 200px;
+          height: auto;
           display: flex;
           align-items: center;
         }
@@ -146,7 +136,7 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
           width: 100%;
           height: auto;
           object-fit: contain;
-}
+        }
 
         .site-name {
           font-size: 1.8rem;
@@ -155,28 +145,48 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
           color: white;
           flex-grow: 1;
           text-align: center;
+          user-select: none;
         }
 
-        .right-links { 
-          display: flex; 
-          align-items: center;
-          gap: 7px; /* more spacious */
-        }
-        .right-links a, .right-links span {
-          position: relative;
+        .right-links {
           display: flex;
           align-items: center;
+          gap: 20px;
+          font-size: 1rem;
+          font-weight: 500;
+        }
+
+        .right-links a, .right-links span {
           color: white;
           text-decoration: none;
-          font-size: 1rem;
           cursor: pointer;
-          transition: color 0.3s ease;
+          position: relative;
+          padding: 5px 8px;
+          border-radius: 4px;
+          transition: background-color 0.3s ease, color 0.3s ease;
+          user-select: none;
         }
-        .right-links a:hover, .right-links span:hover { color: #ffcc00; }
+
+        .right-links a:hover, .right-links span:hover {
+          background-color: #ffcc00;
+          color: #000;
+        }
+
+        .cart-badge {
+          background: red;
+          color: white;
+          font-size: 12px;
+          font-weight: bold;
+          border-radius: 50%;
+          padding: 2px 6px;
+          margin-left: 6px;
+          vertical-align: top;
+        }
 
         /* Tooltip */
         .tooltip-container {
           position: relative;
+          display: inline-block;
         }
         .tooltip-text {
           visibility: hidden;
@@ -193,6 +203,8 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
           white-space: nowrap;
           transition: opacity 0.3s;
           pointer-events: none;
+          user-select: none;
+          z-index: 1500;
         }
         .tooltip-container:hover .tooltip-text {
           visibility: visible;
@@ -206,61 +218,6 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
           background: #555;
           margin: 0 12px;
         }
-
-        /* Cart Badge */
-        .cart-badge {
-          position: absolute;
-          top: -6px;
-          right: -12px;
-          background: red;
-          color: white;
-          font-size: 10px;
-          font-weight: bold;
-          border-radius: 50%;
-          padding: 2px 5px;
-          min-width: 16px;
-          text-align: center;
-          line-height: 1.2;
-        }
-
-        /* HAMBURGER */
-        .hamburger {
-          display: flex;
-          flex-direction: column;
-          cursor: pointer;
-          gap: 6px;
-        }
-        .hamburger span {
-          height: 3px;
-          width: 28px;
-          background: white;
-          border-radius: 3px;
-          transition: 0.3s;
-        }
-        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translateY(10px); }
-        .hamburger.open span:nth-child(2) { opacity: 0; }
-        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translateY(-10px); }
-
-        /* SIDEBAR */
-        .sidebar {
-          position: fixed;
-          top: 0;
-          left: -560px;
-          width: 250px;
-          height: 100%;
-          background: #333;
-          color: white;
-          display: flex;
-          flex-direction: column;
-          padding: 80px 20px 20px;
-          gap: 15px;
-          transition: left 0.3s ease-in-out;
-          z-index: 999;
-        }
-        .sidebar.active { left: 0; }
-        .sidebar h3 { margin-bottom: 10px; font-size: 1.2rem; border-bottom: 1px solid #555; padding-bottom: 8px; }
-        .sidebar a { color: white; text-decoration: none; font-size: 1rem; padding: 8px 0; transition: color 0.3s ease; }
-        .sidebar a:hover { color: #ffcc00; }
 
         /* CART DRAWER */
         .cart-drawer {
@@ -279,7 +236,9 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
           z-index: 999;
           overflow-y: auto;
         }
-        .cart-drawer.open { right: 0; }
+        .cart-drawer.open {
+          right: 0;
+        }
 
         /* POPUP */
         .popup-overlay {
@@ -316,10 +275,33 @@ export default function Navbar({ onLoginClick, isLoggedIn, onLogoutClick }) {
           border-radius: 6px;
           cursor: pointer;
         }
-        .close-btn { background: #ccc; color: #222; }
-        .close-btn:hover { background: #aaa; }
-        .login-btn { background: #ffcc00; color: white; }
-        .login-btn:hover { background: #dbb20a; }
+        .close-btn {
+          background: #ccc;
+          color: #222;
+        }
+        .close-btn:hover {
+          background: #aaa;
+        }
+        .login-btn {
+          background: #ffcc00;
+          color: white;
+        }
+        .login-btn:hover {
+          background: #dbb20a;
+        }
+
+        /* BOTTOM BLACK BAR */
+        .bottom-bar {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: var(--nav-height);
+          background: #000;
+          z-index: 1000;
+          pointer-events: none; /* disable interaction */
+          user-select: none;
+        }
       `}</style>
     </>
   );

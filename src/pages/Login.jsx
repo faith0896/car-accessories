@@ -23,19 +23,17 @@ export default function Login({ onLogin, onClose }) {
     }
 
     try {
-      // Pass role with email and password to backend (role may or may not be used by backend)
       const response = await loginUser({ email, password, role });
-      const userData = response.data; // Expect role in response data
+      const userData = response.data;
 
       if (!userData.role) {
         setError("User role not found. Please check your backend.");
         return;
       }
 
-      onLogin(userData); // Save logged-in user info in app state
-      onClose(); // Close login modal
+      onLogin(userData);
+      onClose();
 
-      // Redirect based on user role
       if (userData.role.toUpperCase() === "ADMIN") {
         navigate("/admin");
       } else if (userData.role.toUpperCase() === "BUYER") {
@@ -97,13 +95,20 @@ export default function Login({ onLogin, onClose }) {
             </label>
           </div>
 
-          <button style={styles.button} type="submit">Login</button>
+          <button
+            style={styles.button}
+            type="submit"
+            onMouseEnter={e => e.currentTarget.style.background = "#333"}
+            onMouseLeave={e => e.currentTarget.style.background = "#000"}
+          >
+            Login
+          </button>
         </form>
 
         <p style={styles.switchText}>
           Don't have an account?{" "}
           <span
-            style={styles.registerLink}
+            style={styles.link}
             onClick={() => {
               onClose();
               window.dispatchEvent(new Event("open-register"));
@@ -122,7 +127,7 @@ const styles = {
     position: "fixed",
     top: 0, left: 0,
     width: "100%", height: "100%",
-    background: "rgba(0,0,0,0.7)",
+    background: "rgba(0,0,0,0.9)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -130,13 +135,14 @@ const styles = {
   },
   loginBox: {
     position: "relative",
-    background: "#fff",
+    background: "#fff",          // white background
     padding: "30px",
     borderRadius: "12px",
     width: "350px",
     textAlign: "center",
     boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
-    borderTop: "6px solid #ffcc00",
+    borderTop: "6px solid #000", // black top border
+    color: "#000",              // black text
   },
   title: {
     marginBottom: "20px",
@@ -146,14 +152,17 @@ const styles = {
     width: "100%",
     padding: "12px",
     marginBottom: "15px",
-    border: "1px solid #ccc",
+    border: "1px solid #000",   // black border
     borderRadius: "8px",
     fontSize: "1rem",
+    background: "#fff",         // white background
+    color: "#000",              // black text
   },
   roleContainer: {
     marginBottom: "15px",
     display: "flex",
     justifyContent: "space-around",
+    color: "#000",
   },
   roleLabel: {
     fontSize: "1rem",
@@ -162,21 +171,26 @@ const styles = {
   button: {
     width: "100%",
     padding: "12px",
-    background: "#ffcc00",
+    background: "#000",          // black button background
     border: "none",
     borderRadius: "8px",
     fontWeight: "bold",
     fontSize: "1rem",
     cursor: "pointer",
     transition: "0.3s",
-  },
-  registerLink: {
-    fontSize: "0.9rem",
-    color: "#007BFF",
-    cursor: "pointer",
+    color: "#fff",               // white text on button
+    boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
   },
   switchText: {
     marginTop: "15px",
+    color: "#000",
+  },
+  link: {
+    fontSize: "0.9rem",
+    color: "#000",
+    cursor: "pointer",
+    fontWeight: "bold",
+    textDecoration: "underline",
   },
   error: {
     color: "red",

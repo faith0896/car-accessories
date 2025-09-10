@@ -1,5 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+// src/App.js
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
 import Navbar from "./components/Navbar.jsx";
 import Home from "./pages/Home.jsx";
 import Shop from "./pages/Shop.jsx";
@@ -17,7 +19,7 @@ export default function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
-  // Switch Login → Register
+  // Listen for custom events to switch between Login and Register modals
   useEffect(() => {
     const handleOpenRegister = () => {
       setShowLogin(false);
@@ -27,7 +29,6 @@ export default function App() {
     return () => window.removeEventListener("open-register", handleOpenRegister);
   }, []);
 
-  // Switch Register → Login
   useEffect(() => {
     const handleOpenLogin = () => {
       setShowRegister(false);
@@ -53,17 +54,19 @@ export default function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/orders" element={<Orders />} />
 
-        {/* Admin Dashboard: protected */}
+        {/* Protected Admin Dashboard */}
         <Route
           path="/admin"
           element={
-            user?.role?.toUpperCase() === "ADMIN"
-              ? <AdminDashboard />
-              : <Navigate to="/" />
+            user?.role?.toUpperCase() === "ADMIN" ? (
+              <AdminDashboard />
+            ) : (
+              <Navigate to="/" />
+            )
           }
         />
 
-        {/* Login and Register pages (optional routing) */}
+        {/* Login and Register Pages */}
         <Route
           path="/login"
           element={<Login onLogin={setUser} onClose={() => setShowLogin(false)} />}
@@ -73,7 +76,7 @@ export default function App() {
           element={<Register onClose={() => setShowRegister(false)} />}
         />
 
-        {/* Payment Page: requires login */}
+        {/* Payment requires login */}
         <Route
           path="/payment"
           element={user ? <PaymentPage /> : <Navigate to="/login" />}
@@ -83,19 +86,19 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
-      {/* Popup Login */}
+      {/* Popup Login Modal */}
       {showLogin && (
         <Login
           onLogin={(loggedInUser) => {
             setUser(loggedInUser);
 
-            // Use navigate to redirect after login (replace window.location.href)
+            // Redirect after login
             if (loggedInUser.role?.toUpperCase() === "ADMIN") {
               window.history.pushState({}, "", "/admin");
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              window.dispatchEvent(new PopStateEvent("popstate"));
             } else {
               window.history.pushState({}, "", "/");
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              window.dispatchEvent(new PopStateEvent("popstate"));
             }
 
             setShowLogin(false);
@@ -104,10 +107,8 @@ export default function App() {
         />
       )}
 
-      {/* Popup Register */}
-      {showRegister && (
-        <Register onClose={() => setShowRegister(false)} />
-      )}
+      {/* Popup Register Modal */}
+      {showRegister && <Register onClose={() => setShowRegister(false)} />}
     </Router>
   );
 }
